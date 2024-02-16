@@ -32,31 +32,41 @@
     <button onclick="search()">Search</button>
     <br />
     <table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Type</th>
-              </tr>
-        </thead>
-        <tbody id="result">
-
-        </tbody>
-     
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="result"></tbody>
     </table>
 
     <script>
-       let ducks = [
-        { id: 1, type: "Mallard" },
-        { id: 2, type: "Redhead" },
-        { id: 3, type: "Decoy" },
-      ];
-
-      async function search() {    
-
+      let ducks = [];
+      async function getAll() {
+        let host = "http://localhost:8090";
+        try {
+          let response = await fetch(host + "/ducks");
+          if (response.ok) {
+            let data = await response.json();
+            return data;
+          } else {
+            console.error("Failed to fetch ducks:", response.status);
+            return [];
+          }
+        } catch (error) {
+          console.error("Error while fetching ducks:", error);
+          return [];
+        }
+      }
+      async function search() {
+        if (ducks.length == 0) {
+          ducks = await getAll();
+        }
         let duckType = document.getElementById("type").value;
         let table = document.getElementById("result");
         table.innerHTML = "";
-        
+
         for (let duck of ducks) {
           if (!duckType || duck.type.toLowerCase() == duckType.toLowerCase()) {
             let row = document.createElement("tr");
